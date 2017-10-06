@@ -2,10 +2,10 @@
 
 ## What it does?
 
-Converts laser scan data to AutoCAD .dxf file format
+Converts laser scan data to AutoCAD .dxf file format.
 
 
-##How to use
+## How to use
 
 Simply upload the laser scan file and specify the output directory. 
 
