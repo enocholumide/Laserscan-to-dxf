@@ -7,6 +7,8 @@ Converts laser scan data to AutoCAD .dxf file format.
 
 ## How to use
 
+Download and run the jar file on GitHub and run on any platform that you are using.
+
 Simply upload the laser scan file and specify the output directory. 
 
 Common options are enabled on startup, but you can change the settings as it conforms to your laser scan data and some handy dxf export options.
