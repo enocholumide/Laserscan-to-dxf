@@ -29,6 +29,7 @@ import core.CheckBoxWithText;
 import core.MemoryTextField;
 import core.Point3D;
 import core.RadioButton;
+import toolkit.Toolset;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -279,12 +280,11 @@ public class Converter extends JFrame {
 		rdbtnOther.setBounds(6, 50, 60, 23);
 		delimeterButtonGroup.add(rdbtnOther);
 		delimeterAndSeparatorPanel.add(rdbtnOther);
-		
+			
 		rdbtnOther.addItemListener(new ItemListener() {
-
+			
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					otherDelimeter.setEnabled(true);
 					otherDelimeter.setEditable(true);
@@ -307,28 +307,18 @@ public class Converter extends JFrame {
 		otherDelimeter.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
-			public void changedUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void changedUpdate(DocumentEvent e) {}
 
 			@Override
-			public void insertUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				//rdbtnOther.setUserData(otherDelimeter.getText());
+			public void insertUpdate(DocumentEvent e) {;
 				rdbtnOther.setActionCommand(otherDelimeter.getText());
 			}
 
 			@Override
-			public void removeUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void removeUpdate(DocumentEvent e) {}
 			
 		});
 		
-		
-
 		JPanel panel_7 = new JPanel();
 		panel_7.setToolTipText("<html>\r\nSpecify custom decimal separator<br>\r\ne.g.<br> \r\n50.02 -> point <br>\r\n50,02 -> comma<br>\r\n</html>");
 		panel_7.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Decimal separator", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -435,9 +425,9 @@ public class Converter extends JFrame {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				// TODO Auto-generated method stub
+				
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					getDataInfo();
+					getDataStatistics();
 				} else if(e.getStateChange() == ItemEvent.DESELECTED) {
 					
 				}
@@ -516,7 +506,7 @@ public class Converter extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 								
-				createSCRFromPTS(ptsFile);
+				generateDXF(ptsFile);
 				
 			}
 			
@@ -526,13 +516,12 @@ public class Converter extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				int returnVal = dirChooser.showOpenDialog(Converter.this);
-				
 				if(returnVal == JFileChooser.APPROVE_OPTION) {
 					textOutputDir.setText(dirChooser.getCurrentDirectory().getAbsolutePath()+"\\"+fileChooser.getName(fileChooser.getSelectedFile())+".dxf");
 				}
 			}
+			
 		});
 		
 		btnUpload.addActionListener(new ActionListener() {
@@ -556,11 +545,8 @@ public class Converter extends JFrame {
 						btnDownload.setEnabled(true);
 						btnDownload.setForeground(SystemColor.textHighlightText);
 						btnDownload.setBackground(SystemColor.infoText);
-						
-						setDataReader();
-						
+												
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 			        
@@ -575,18 +561,14 @@ public class Converter extends JFrame {
 		fileChooser.setFileFilter(filter);
 	}
 	
-	protected void getDataInfo() {
-		
-		//------------------
-		double minX = 0.0;
-		double minY = 0.0;
-		double maxX = 0.0;
-		double maxY = 0.0;
-		//------------------
+	/**
+	 * Computes the statistics of the data, mean, average etc
+	 * Method not yet completed for the v1.0 basic. Therefore data statistics not yet available.
+	 */
+	private void getDataStatistics() {
 		
 		List<Double> xValues = new ArrayList<Double>();
 		List<Double> yValues = new ArrayList<Double>();
-		
 		
 		if(reader!=null) {
 		
@@ -634,8 +616,8 @@ public class Converter extends JFrame {
             
 		}
 		
-		System.out.println(xValues.get(findMinIndex(xValues)));
-		System.out.println(yValues.get(findMinIndex(yValues)));
+		System.out.println(xValues.get(Toolset.findMinIndex(xValues)));
+		System.out.println(yValues.get(Toolset.findMinIndex(yValues)));
 		
 		/*this.minX.addToList(String.valueOf(minX));
 		this.minY.addToList(String.valueOf(minY));
@@ -649,39 +631,11 @@ public class Converter extends JFrame {
 		
 	}
 	
-	public static <T extends Comparable<T>> int findMinIndex(final List<T> xs) {
-	    int minIndex;
-	    if (xs.isEmpty()) {
-	        minIndex = -1;
-	    } else {
-	        final ListIterator<T> itr = xs.listIterator();
-	        T min = itr.next(); // first element as the current minimum
-	        minIndex = itr.previousIndex();
-	        while (itr.hasNext()) {
-	            final T curr = itr.next();
-	            if (curr.compareTo(min) < 0) {
-	                min = curr;
-	                minIndex = itr.previousIndex();
-	            }
-	        }
-	    }
-	    return minIndex;
-	}
-	
-	protected void setDataReader() {
-		
-		FileReader isr = null;
-		try {
-            isr = new FileReader(ptsFile);
-        } catch (FileNotFoundException e) {
-            System.err.println("File not found in res; don't use any extension");
-        }
-		
-		this.reader = new BufferedReader(isr);
-		
-	}
-
-	protected void createSCRFromPTS(File ptsFile) {
+	/**
+	 * Generates .dxf file
+	 * @param inputFIle uploaded laserscan file.
+	 */
+	private void generateDXF(File inputFIle) {
 		
 		long lStartTime = System.nanoTime();
 
@@ -689,18 +643,19 @@ public class Converter extends JFrame {
 		dxfFile = new File(textOutputDir.getText());
 		
 		//BufferedWriter writer = null;
-		BufferedReader  reader = null;
+		BufferedReader  inputFileBufferedReader = null;
+		FileReader inputFileReader = null;
 		
-		FileReader isr = null;
 		try {
-            isr = new FileReader(ptsFile);
+            inputFileReader = new FileReader(inputFIle);
         } catch (FileNotFoundException e) {
-            System.err.println("File not found in res; don't use any extension");
+            System.err.println("Cannot read input file.");
+            JOptionPane.showMessageDialog(null, "Something went wrong!"
+        			+ "\nCannot read input file", "Fatal error", JOptionPane.ERROR_MESSAGE);
         }
 		
-		reader = new BufferedReader(isr);
-        
-              
+		inputFileBufferedReader = new BufferedReader(inputFileReader);
+             
         String line;
         boolean success = true;
         
@@ -712,11 +667,15 @@ public class Converter extends JFrame {
         	writeDXFHeader();
         	dxf.write("\n0\nSECTION\n2\nENTITIES");
         	
+        	// Ignoring writing .scr file
+        	// This was the first atemot before deciding to wrte dxf file directly
+        	// Disabling it to reduce the processing time for writing the dxf file.
+        	
         	/*writer = new BufferedWriter(new FileWriter(scrFile));
         	writer.write("_MULTIPLE _POINT");
         	writer.newLine();*/
         	
-        	int start = 1;
+        	int start = Integer.parseInt(startNumberChkbox.getTextField().getText());
         	int nextProcessedNumber = 0;
         	int intervalFactor = 0;
         	
@@ -733,7 +692,7 @@ public class Converter extends JFrame {
         	
         	
             while (true) {
-	                line = reader.readLine();
+	                line = inputFileBufferedReader.readLine();
 	                
 	                if( start <= count) {
 	                	if(count == nextProcessedNumber) {
@@ -752,15 +711,14 @@ public class Converter extends JFrame {
 			                				Double.parseDouble(currentLine[0]), 
 			                				Double.parseDouble(currentLine[1]), 
 			                				Double.parseDouble(currentLine[2])
-			                		);
+			                				);
 			                		point.setColor(new Color(
-			                				Integer.parseInt(currentLine[3]), 
 			                				Integer.parseInt(currentLine[4]), 
 			                				Integer.parseInt(currentLine[5]), 
-			                				Integer.parseInt(currentLine[6])));
+			                				Integer.parseInt(currentLine[6])
+			                				));
 			                		
 			                		writeDXFPoint(point);
-			                		
 			                		//System.out.println(nextProcessedNumber);
 			                		if(intervalIsSelected) {
 			                			nextProcessedNumber = count + intervalFactor;
@@ -793,16 +751,17 @@ public class Converter extends JFrame {
   
         } catch (IOException e) {
         	success = false;
-            System.err.println("Error reading the file");
-            e.printStackTrace();
+        	//String[] error = e.getMessage().split("(");
+            System.err.println("Fata Error");
+            JOptionPane.showMessageDialog(null, "An error has occured.\nError: "
+        			+ e.getMessage(), "System Error", JOptionPane.ERROR_MESSAGE);
         }
         
         finally{
         	try {
         		//System.out.println(processedPoints);
 				//writer.close();
-				
-				// End dxf writer
+        		// End dxf writer
 				dxf.write("\n0");
 	            dxf.write("\nEOF");
 				dxf.close();
@@ -814,36 +773,40 @@ public class Converter extends JFrame {
         if(success) {
         	
         	long lEndTime = System.nanoTime();
-        	//time elapsed
-             long output = lEndTime - lStartTime;
+            long timeElapsed = lEndTime - lStartTime;
              
         	JOptionPane.showMessageDialog(null, "Operation Successful!"
         			+ "\nTotal of  " + processedPoints + " points processed"
-        					+ "\nElapsed time in milliseconds: " + output / 1000000, "Finished", JOptionPane.INFORMATION_MESSAGE);
+        					+ "\nElapsed time in milliseconds: " + timeElapsed / 1000000, "Finished", JOptionPane.INFORMATION_MESSAGE);
         	
         	if(openDxfCheckBox.isSelected()) {
 	        	try {
-					Desktop.getDesktop().open(this.dxfFile);
-					handleWindowClosingEvent();
+					if(Desktop.isDesktopSupported()) {
+						Desktop.getDesktop().open(this.dxfFile);
+						handleWindowClosingEvent();
+					}else {
+						JOptionPane.showMessageDialog(null, "Error: Cannot open dxf file.", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
         	}
         	
         } else {
         	JOptionPane.showMessageDialog(null, "Something NOT Successful", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        
-        
+        } 
 	}
 
-
+	/**
+	 * Writes the header of the d.xf file. To be called once in the writing process.
+	 */
 	private void writeDXFHeader() {
 		
 		try {
 			dxf.write("999");
-			dxf.write("\nDXF created from <PTS to Dxf Converter> by <Olumide Igbiloba>\n999\nAll rights reserved (c)2017");
+			dxf.write("\nDXF created from <Laserscan-to-dxf converter> by <Olumide Igbiloba>\n999\n(c)2017 All rights reserved");
 			dxf.write("\n0\nSECTION");
 			dxf.write("\n2\nHEADER");
 			dxf.write("\n9\n$ACADVER\n1");
@@ -882,12 +845,9 @@ public class Converter extends JFrame {
 		}
 	}
 	
-	private void getNextIntervalPoint() {
-		
-	}
 
 	/**
-	 * 
+	 * Writes an instance of point to a dxf file
 	 * @param point
 	 */
 	private void writeDXFPoint(Point3D point) {
@@ -919,7 +879,10 @@ public class Converter extends JFrame {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * Closes the application.
+	 */
 	protected void handleWindowClosingEvent() {
 		// TODO Auto-generated method stub
 		dispose();
