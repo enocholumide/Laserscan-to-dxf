@@ -22,13 +22,23 @@ public class MemoryTextField extends JTextField {
 	private List<String> memoryList = new ArrayList<String>();
 	private boolean isAlreadyCalculated = false;
 	private JCheckBox toggler = new JCheckBox();
+	private String originalText = "";
 	
 	public MemoryTextField(String title, JCheckBox toggler) {
 		super.setText(title);
 		this.toggler = toggler;
 	}
 	
+	public MemoryTextField(String text) {
+		super.setText(text);
+		setOriginalText(text);
+	}
+	
 	public MemoryTextField() {
+	}
+	
+	public void setOriginalText(String originalText) {
+		this.originalText = originalText;
 	}
 
 	/**
@@ -76,6 +86,18 @@ public class MemoryTextField extends JTextField {
 	public void addToList(String item) {
 		this.memoryList.add(item);
 		super.setText(item);
+	}
+	
+	public String getOriginalText() {
+		return this.originalText;
+	}
+	
+	public void setToOriginalText() {
+		super.setText(originalText);
+	}
+	
+	public boolean isOriginalTextField() {
+		return super.getText().equals(this.originalText);
 	}
 	
 

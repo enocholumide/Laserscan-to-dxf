@@ -34,4 +34,18 @@ public class Toolset {
 	    return minIndex;
 	}
 	
+	public static int closestNumber(int[]numbers , int number) {
+		
+		int distance = Math.abs(numbers[0] - number);
+		int idx = 0;
+		for(int c = 1; c < numbers.length; c++){
+		    int cdistance = Math.abs(numbers[c] - number);
+		    if(cdistance < distance){
+		        idx = c;
+		        distance = cdistance;
+		    }
+		}
+		return numbers[idx];
+	}
+	
 }

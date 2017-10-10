@@ -12,7 +12,7 @@ import java.awt.Color;
 public class Point3D {
 	
 	private double x,y,z;
-	private Color color;
+	private Color color = new Color(0,0,0);
 	
 	
 
